@@ -5,25 +5,41 @@ import java.util.ArrayList;
 import bohnenspiel.*;
 
 /**
- * @author Frank Wu
+ * @author Frank Wu - 260580792
+ * 
  * Node class for search tree
- * qsa - Value of taking an action a from states s
+ * This class is used for both Monte Carlo and Minimax and it has two constructor accordingly.
+ * win - Value of taking an action a from states s
  * nsa - Number of times we have taken action a from state s
- * ns - Number of times we have visited state s in simulations
+ * visit - Number of times we have visited state s in simulations
  */
 public class Node {
 	BohnenspielBoardState boardState;
 	ArrayList<Node> children;
 	Node parent;
+	BohnenspielMove move;//the move the parent take to get to this state.
 	
-	public int qsa;
-	public int ns;
+	//minmax
+	public double value;
+	//monte carlo
+	public double win;
+	public double visit;
 	
-	public Node(BohnenspielBoardState boardState , int qsa ,int ns){
+	//constructor for node in Monte Carlo Search Tree
+	public Node(BohnenspielBoardState boardState, BohnenspielMove move , double win ,double visit){
+		this.boardState = boardState;
+		this.move = move;
+		this.children = new ArrayList<Node>();
+		this.win = win;
+		this.visit = visit;
+	}
+	
+	//constructor for node in MinMax Search Tree
+	public Node(BohnenspielBoardState boardState,BohnenspielMove move, double value){
 		this.boardState = boardState;
 		this.children = new ArrayList<Node>();
-		this.qsa = qsa;
-		this.ns = ns;
+		this.move = move;
+		this.value = value;
 	}
 	
 	public Node(BohnenspielBoardState boardState ){
@@ -32,13 +48,14 @@ public class Node {
 	}
 	
 	public Node getChild(int index){
-		if(children.size()>index && children.get(index) != null){
+		if(children.get(index) != null){
 			return children.get(index);
 		}else{
 			System.out.println("child is null!");
 			return null;
 		}
 	}
+	
 	
 	public void setChild(ArrayList<Node> children){
 		this.children = children;
@@ -59,5 +76,9 @@ public class Node {
 		return false;
 	}
 	
+	public BohnenspielMove getMove(){
+		return move;
+	}
+
 	
 }

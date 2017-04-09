@@ -19,14 +19,13 @@ public class MyTools {
      * @param ns - Number of times we have visited state s in simulations
      * @return - Upper bound on the value of taking action a in state s
      */
-    public static double UCB(double reward, int nsa, int ns){
-    	//use c = sqrt(2) for scalling factor
-    	double result = reward;
-    	result += Math.sqrt(2*Math.log(ns)/nsa);
+    public static double UCB(double childWin, double childVisit, double visit, double ScallingFactor){
+    	//use c = 2 for scalling factor
+    	double result = childWin/childVisit+ScallingFactor*Math.sqrt(Math.log(visit)/childVisit);
     	return result;
     }
     
-    public static int RandomRollOut(BohnenspielBoardState board_state,int player_id){
+    public static double RandomRollOut(BohnenspielBoardState board_state,int player_id){
     	BohnenspielBoardState cloned_board_state = (BohnenspielBoardState) board_state.clone();
     	
     	while(!cloned_board_state.gameOver()){

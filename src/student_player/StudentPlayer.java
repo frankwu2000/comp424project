@@ -6,6 +6,7 @@ import bohnenspiel.BohnenspielBoardState;
 import bohnenspiel.BohnenspielMove;
 import bohnenspiel.BohnenspielPlayer;
 import bohnenspiel.BohnenspielMove.MoveType;
+import student_player.mytools.MinMax;
 import student_player.mytools.MonteCarlo;
 import student_player.mytools.MyTools;
 
@@ -32,35 +33,16 @@ bohnenspiel.RandomPlayer
         int[] my_pits = pits[player_id];
         int[] op_pits = pits[opponent_id];
 
-        // Get the legal moves for the current board state.
-        ArrayList<BohnenspielMove> moves = board_state.getLegalMoves();
-        BohnenspielBoardState cloned_board_state = (BohnenspielBoardState) board_state.clone(); 
-
-      //  BohnenspielMove move = moves.get(0);
-        
-        // search Tree algorithm
+// Monte Carlo search Tree algorithm
         long currentTime = System.currentTimeMillis();
-        MonteCarlo MC = new MonteCarlo(board_state,currentTime, player_id);
-        BohnenspielMove move = moves.get(MC.getBestMove());
-       // MC.DrawTree();
+// Constructor of algorithm class: (board_state, currentTime , playerID, time limit no more than 400 ms)
+        MonteCarlo MC = new MonteCarlo(board_state,currentTime, player_id,400);
+        BohnenspielMove move = MC.getBestMove();
+        MC.DrawTreeRoot();
         
-/*		test algorith - delete after complete all        
-        int bestScore = -1;
-        BohnenspielMove bestMove = moves.get(0);
-        for(int i = 0 ; i< moves.size();i++){
-        	BohnenspielBoardState cloned_board_state = (BohnenspielBoardState) board_state.clone();
-	        BohnenspielMove move1 = moves.get(i);
-	        cloned_board_state.move(move1);
-	        int score = MyTools.RandomRollOut(cloned_board_state, player_id);
-	        if (score > bestScore){
-		        bestMove=move1;
-		        bestScore=score;
-	        }
-        }
-        
-        // But since this is a placeholder algorithm, we won't act on that information.
-        return bestMove; 
- */
+// MiniMax for experiment, not the primary algorithm
+    // 	MinMax Mm = new MinMax(board_state,1,currentTime,player_id);
+    //  BohnenspielMove move = Mm.MinMax();
         return move;
     }
 }
