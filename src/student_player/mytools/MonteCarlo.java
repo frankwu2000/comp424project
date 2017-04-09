@@ -25,7 +25,7 @@ public class MonteCarlo {
 	}
 	
 	public void Run(){
-		while(System.currentTimeMillis() < time+600){
+		while(System.currentTimeMillis() < time+200){
 		//for(int counter = 0 ; counter < maxStep; counter++){
 			Node currentNode = root;
 			while(!currentNode.IsLeaf()){
@@ -113,6 +113,7 @@ public class MonteCarlo {
 			if(currentNode.children.get(i).ns == 0){
 				return i;
 			}
+			//double childQsa = MyTools.UCB(currentNode.getChild(i).qsa/currentNode.getChild(i).ns, currentNode.getChild(i).ns, currentNode.ns);
 			double childQsa = MyTools.UCB(currentNode.getChild(i).qsa, currentNode.getChild(i).ns, currentNode.ns);
 			if(childQsa > maxQsa){
 				maxQsa = childQsa;
