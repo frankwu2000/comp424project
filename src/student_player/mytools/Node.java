@@ -8,7 +8,7 @@ import bohnenspiel.*;
  * @author Frank Wu - 260580792
  * 
  * Node class for search tree
- * This class is used for both Monte Carlo and Minimax and it has two constructor accordingly.
+ * This class is used for Monte Carlo algorithm.
  * win - Value of taking an action a from states s
  * nsa - Number of times we have taken action a from state s
  * visit - Number of times we have visited state s in simulations
@@ -19,8 +19,6 @@ public class Node {
 	Node parent;
 	BohnenspielMove move;//the move the parent take to get to this state.
 	
-	//minmax
-	public double value;
 	//monte carlo
 	public double win;
 	public double visit;
@@ -32,14 +30,6 @@ public class Node {
 		this.children = new ArrayList<Node>();
 		this.win = win;
 		this.visit = visit;
-	}
-	
-	//constructor for node in MinMax Search Tree
-	public Node(BohnenspielBoardState boardState,BohnenspielMove move, double value){
-		this.boardState = boardState;
-		this.children = new ArrayList<Node>();
-		this.move = move;
-		this.value = value;
 	}
 	
 	public Node(BohnenspielBoardState boardState ){

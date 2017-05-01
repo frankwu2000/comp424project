@@ -38,7 +38,7 @@ bohnenspiel.RandomPlayer
 // Constructor of algorithm class: (board_state, currentTime , playerID, time limit no more than 400 ms)
         MonteCarlo MC = new MonteCarlo(board_state,currentTime, player_id,400);
         BohnenspielMove move = MC.getBestMove();
-        MC.DrawTreeRoot();
+      // MC.DrawTreeRoot();
         
 // MiniMax for experiment, not the primary algorithm
     // 	MinMax Mm = new MinMax(board_state,1,currentTime,player_id);

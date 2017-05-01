@@ -1,6 +1,8 @@
 package student_player.mytools;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import bohnenspiel.BohnenspielBoardState;
 import bohnenspiel.BohnenspielMove;
@@ -13,160 +15,97 @@ import bohnenspiel.BohnenspielMove;
  */
 public class MinMax {
 	int player_id;
-	Node root;
+	int opponent_id;
+	BohnenspielBoardState root ;
 	long time;
 	BohnenspielMove BestMove;
 	int maxDepth;
 	
 	public MinMax(BohnenspielBoardState board_state ,int maxDepth,long time, int player_id){
 		this.player_id = player_id;
-		this.maxDepth = maxDepth;
-		this.root = new Node(board_state,null,0);
+		BohnenspielBoardState cloned_board_state = (BohnenspielBoardState) root.clone();
+	    cloned_board_state.move(cloned_board_state.getLegalMoves().get(0));
+	    this.opponent_id = cloned_board_state.getTurnPlayer();
+	   
+	    this.maxDepth = maxDepth;
+		this.root = board_state;
 		this.time = time;
 	}
 	
-	//Too much cost - not using it with maxDepth more than 2
-	public void BuildTree(Node node){
-		if(node.boardState.getTurnNumber()-root.boardState.getTurnNumber()>maxDepth){
-			return;
-		}else{
-			AddChildren(node);
-			for(Node child : node.children){
-				BuildTree(child);
-			}
-		}
-		
-	}
+	
 	
 	public BohnenspielMove MinimaxDecision(){
-		BuildTree(root);
-		double BestValue = -1;
-		int BestNode = -1;
-		for(int i=0;i<root.children.size();i++){
-			double value = MinimaxValue(root.getChild(i));
-			if(value>BestValue){
-				BestValue = value;
-				BestNode = i;
-			}
-		}
-		return root.getChild(BestNode).getMove();
-	//	return root.getChild(0).getMove();
-		
+		return root.getLegalMoves().get(0);
 	}
 	
-	private double MinimaxValue(Node node){
-		if(node.IsLeaf()){
-			return node.value;
+	private int MinimaxValue(BohnenspielBoardState state){
+		if(state.getTurnNumber()-root.getTurnNumber()>=maxDepth||state.gameOver()){
+			return state.getScore(player_id)-state.getScore(opponent_id);
 		}
-		for(Node child : node.children){
-			child.value = MinimaxValue(child);
-		}
+//		ArrayList<BohnenspielBoardState> successors = GetSuccessor(state);
+//		Map<BohnenspielBoardState,Integer> values = new HashMap();
+//		for(BohnenspielBoardState successor : successors){
+//			int value = MinimaxValue(successor);
+//			values.put(successor, value);
+//		}
 		//max player
-		if(node.boardState.getTurnPlayer() == player_id){
-			int maxChild = GetMaxValueChild(node);
-			return node.getChild(maxChild).value;
+		if(state.getTurnPlayer() == player_id){
+			return GetMaxValueChild(state);
 		}
 		//min player
 		else{
-			int minChild = GetMinValueChild(node);
-			return node.getChild(minChild).value;
+			return GetMinValueChild(state);
 		}
 	}
 	
-	public int GetMaxValueChild(Node node){
-		double maxValue = -1;
-		int maxChild = -1;
-		for(int i = 0 ; i < node.children.size() ;i++){
-			if(node.getChild(i).value>maxValue){
-				maxChild = i;
-				maxValue = node.getChild(i).value;
-			}
+	public int GetMaxValueChild(BohnenspielBoardState state){
+		int bestscore=-9999;
+		ArrayList<BohnenspielMove> moves = state.getLegalMoves();
+		for(int i = 0 ; i <moves.size() ;i++){
+			BohnenspielBoardState cloned_board_state = (BohnenspielBoardState) state.clone();
+		    BohnenspielMove move1 = moves.get(i);
+		    cloned_board_state.move(move1);
+		    //score = our_player - opponent player
+		    int score=cloned_board_state.getScore(player_id) - cloned_board_state.getScore(opponent_id);
+		    if (score>bestscore)
+		    {
+		        bestscore=score;
+	        }
 		}
-		return maxChild;
+		return bestscore;
 	}
 	
-	public int GetMinValueChild(Node node){
-		double minValue = 10000000;
-		int minChild = -1;
-		for(int i = 0 ; i < node.children.size() ;i++){
-			if(node.getChild(i).value<minValue){
-				minChild = i;
-				minValue = node.getChild(i).value;
-			}
+	public int GetMinValueChild(BohnenspielBoardState state){
+		int bestscore = 10000000;
+		ArrayList<BohnenspielMove> moves = state.getLegalMoves();
+		for(int i = 0 ; i <moves.size() ;i++){
+			BohnenspielBoardState cloned_board_state = (BohnenspielBoardState) state.clone();
+		    BohnenspielMove move1 = moves.get(i);
+		    cloned_board_state.move(move1);
+	        //score = our_player - opponent player
+	        int score=cloned_board_state.getScore(player_id) - cloned_board_state.getScore(opponent_id);
+	        if (score<bestscore)
+	        {
+		        bestscore=score;
+	        }
 		}
-		return minChild;
+		return bestscore;
+	}
+	
+	public ArrayList<BohnenspielBoardState> GetSuccessor(BohnenspielBoardState state){
+		ArrayList<BohnenspielBoardState> successors = new ArrayList<BohnenspielBoardState>();
+		ArrayList<BohnenspielMove> moves = state.getLegalMoves();
+		for(int i = 0 ; i <moves.size() ;i++){
+			BohnenspielBoardState cloned_board_state = (BohnenspielBoardState) state.clone();
+		    BohnenspielMove move1 = moves.get(i);
+		    cloned_board_state.move(move1);
+		    successors.add(cloned_board_state);
+		}
+		return successors;
 	}
 	
 	
-	public void AddChildren(Node currentNode){
-		ArrayList<BohnenspielMove> moves = currentNode.boardState.getLegalMoves();
-		for(int i = 0 ; i < moves.size() ; i++){
-			BohnenspielBoardState cloned_board_state = (BohnenspielBoardState) currentNode.boardState.clone();
-			cloned_board_state.move(moves.get(i));
-			Node newChild;
-			if(cloned_board_state.getTurnNumber()-root.boardState.getTurnNumber() == maxDepth){
-				newChild = new Node(cloned_board_state,moves.get(i),cloned_board_state.getScore(player_id));
-			}else{
-				newChild = new Node(cloned_board_state,moves.get(i),0);
-			}
-			
-			newChild.parent = currentNode;
-			currentNode.children.add(newChild);
-		}
-		
-	}
-	
-	
-//	//second version of MinMax
-//	public BohnenspielMove MinMax2(){
-//		double bestScore = -9999;
-//		BohnenspielMove bestMove =  root.boardState.getLegalMoves().get(0);
-//		for(BohnenspielMove move1 : root.boardState.getLegalMoves()){
-//			BohnenspielBoardState cloned_board_state = (BohnenspielBoardState) root.boardState.clone();
-//	        cloned_board_state.move(move1);
-//		    double score= minPlay(cloned_board_state);
-//		    if(score > bestScore){
-//		    	bestMove = move1;
-//		    	bestScore = score;
-//		    }
-//		}
-//		return bestMove;
-//	}
-//	
-//	double minPlay(BohnenspielBoardState boardState){
-//		
-//		if((boardState.getTurnNumber()-root.boardState.getTurnNumber()>maxDepth) || boardState.gameOver()){
-//			return boardState.getScore(player_id);
-//		}
-//			ArrayList<BohnenspielMove> moves = boardState.getLegalMoves();
-//			double bestScore = 99999;
-//			for(BohnenspielMove move : moves){
-//				BohnenspielBoardState cloned_board_state = (BohnenspielBoardState) boardState.clone();
-//			    double score = maxPlay(cloned_board_state);
-//			    if(score < bestScore){
-//			    	BestMove = move;
-//			    	bestScore = score;
-//			    }
-//			}
-//			return bestScore;
-//	}
-//	
-//	double maxPlay(BohnenspielBoardState boardState){
-//		if((boardState.getTurnNumber()-root.boardState.getTurnNumber()>maxDepth) || boardState.gameOver()){
-//			return boardState.getScore(player_id);
-//		}
-//			ArrayList<BohnenspielMove> moves = boardState.getLegalMoves();
-//			double bestScore = -99999;
-//			for(BohnenspielMove move : moves){
-//				BohnenspielBoardState cloned_board_state = (BohnenspielBoardState) boardState.clone();
-//			    double score = minPlay(cloned_board_state);
-//			    if(score > bestScore){
-//			    	BestMove = move;
-//			    	bestScore = score;
-//			    }
-//			}
-//			return bestScore;
-//	}
+
 		
 	
 }
